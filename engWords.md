@@ -1,5 +1,7 @@
 camel case /ˈkæməl keɪs/ верблюжий ВерблюжийРегистр.
 
+spread /spred/ распространение
+
 pure /pjʊə/ adj чистый
 
 XSS /eks es es/ Cross-site scripting - межсайтовый скриптинг
