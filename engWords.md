@@ -1,19 +1,19 @@
-pure [pjʊə] adj чистый
+camel case /ˈkæməl keɪs/ верблюжий ВерблюжийРегистр.
 
-XSS [eks es es] Cross-site scripting - межсайтовый скриптинг
+pure /pjʊə/ adj чистый
 
-JSX [dgei es eks] JavaScript XML - расширение синтаксиса JS
+XSS /eks es es/ Cross-site scripting - межсайтовый скриптинг
+
+JSX /dgei es eks/ JavaScript XML - расширение синтаксиса JS
 
 UI /ˌjuːˈaɪ/ User Interface - Пользовательский интерфейс
 
 Babel /ˈbeɪ.bəl/
 
-component [kəmˈpəʊnənt]
+component /kəmˈpəʊnənt/
 
-element [ˈelɪmənt]
+element /ˈelɪmənt/
 
 lifecycle /ˈlaɪf ˌsaɪ.kəl/
 
 side effect /saɪd ɪˈfekt/ побочные эффекты
-
-commit /kəˈmɪt/ фиксировать, совершить
