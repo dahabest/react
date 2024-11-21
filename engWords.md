@@ -4,6 +4,10 @@ spread /spred/ распространение
 
 pure /pjʊə/ adj чистый
 
+render /ˈren.dər/ предоставлять, выводить, отображаться
+
+rendering /ˈren.dər.ɪŋ/ визуализация, отрисовка
+
 XSS /eks es es/ Cross-site scripting - межсайтовый скриптинг
 
 JSX /dgei es eks/ JavaScript XML - расширение синтаксиса JS
