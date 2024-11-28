@@ -8,7 +8,11 @@ render /ˈren.dər/ предоставлять, выводить, отображ
 
 rendering /ˈren.dər.ɪŋ/ визуализация, отрисовка
 
+side effect /saɪd ɪˈfekt/ побочные эффект, побочное действие, побочное влияние
+
 XSS /eks es es/ Cross-site scripting - межсайтовый скриптинг
+
+XML /eks.emˈel/ eXtensible Markup Language - «расширяемый язык разметки»
 
 JSX /dgei es eks/ JavaScript XML - расширение синтаксиса JS
 
@@ -22,4 +26,8 @@ element /ˈelɪmənt/
 
 lifecycle /ˈlaɪf ˌsaɪ.kəl/
 
-side effect /saɪd ɪˈfekt/ побочные эффекты
+fragment /ˈfrægmənt/ фрагмент
+
+Dom /dɒm/ Document Object Model - Объектная модель документа
+
+null /nʌl/ adj нулевой, пустой, нуль, обнулять
