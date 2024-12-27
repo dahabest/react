@@ -1,6 +1,6 @@
 const { markdown: md } = require("markdown");
 
-TAGS = ["Intro", "YouWillLearn", "Diagram", "Recap"];
+TAGS = ["Intro", "YouWillLearn", "Diagram", "Recap", "DeepDive"];
 OPEN_TAGS = TAGS.map((tag) => `<${tag}>`);
 const rWord = /.*\w+/i;
 
@@ -8,6 +8,9 @@ const isOpenTag = (paragraph) =>
   TAGS.find((tag) => paragraph.startsWith(`<${tag}`));
 
 const isCloseTag = (paragraph, tag) => paragraph.includes(`</${tag}>`);
+const isCloseAnyTag = (paragraph) =>
+  TAGS.find((tag) => paragraph.includes(`</${tag}`));
+
 const isHeader = (paragraph) => paragraph.startsWith("##");
 
 /* IsStart is opened tag or header or closed tag
@@ -54,7 +57,8 @@ async function parseMarkdownFileOld(paragraphsOld) {
     if (
       isStart &&
       (isHeader(paragraph) ||
-        isCloseTag(paragraph, tag) ||
+        //isCloseTag(paragraph, tag) ||
+        isCloseAnyTag(paragraph) ||
         isOpenTag(paragraph))
     ) {
       if (hasText(toTranslate)) {
@@ -73,16 +77,6 @@ async function parseMarkdownFileOld(paragraphsOld) {
       //console.log({ tag });
       isStart = true;
     }
-
-    // after adding a close tag(</Tag>) into the File (exclude key)
-    //console.log({ paragraph, tag, isCLose: isCloseTag(paragraph, tag) });
-    /*  if (isCloseTag(paragraph, tag)) {
-      translate();
-      reset();
-
-      isStart = true;
-      tag = "closed";
-    } */
   }
 
   // console.log("newFile", newFile);
