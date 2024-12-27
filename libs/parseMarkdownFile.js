@@ -1,11 +1,15 @@
 const { markdown: md } = require("markdown");
 const { translateParagraphs } = require("./translate");
+const { writeFile } = require("node:fs/promises");
 
-TAGS = ["Intro", "YouWillLearn", "Diagram", "Recap", "DeepDive"];
+TAGS = ["Intro", "YouWillLearn", "Diagram", "Recap", "DeepDive", "Sandpack"];
+CLOSE_TAGS = [...TAGS, "Sandpack"];
+CODE_TAGS = ["Sandpack"];
 OPEN_TAGS = TAGS.map((tag) => `<${tag}>`);
+
 const rWord = /.*\w+/i;
 
-const isOpenTag = (paragraph) =>
+const isOpenAnyTag = (paragraph) =>
   TAGS.find((tag) => paragraph.startsWith(`<${tag}`));
 
 const isCloseTag = (paragraph, tag) => paragraph.includes(`</${tag}>`);
@@ -14,13 +18,18 @@ const isCloseAnyTag = (paragraph) =>
 
 const isHeader = (paragraph) => paragraph.startsWith("##");
 
-/* IsStart is opened tag or header or closed tag
+const isCodeTag = (paragraph) =>
+  CODE_TAGS.find((tag) => paragraph.startsWith(`<${tag}`));
 
+const isOpenTag = (paragraph) =>
+  isOpenAnyTag(paragraph) && !isCodeTag(paragraph);
+
+/* IsStart is opened tag or header or closed tag
 IsStart and (isHeader or isOpenTag or isCloseTag) and 
-to translate.join().is word then need transkate */
-async function parseMarkdownFileOld(paragraphsOld) {
+to translate.join().is word then need translate */
+async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
   let paragraphs = paragraphsOld; //.slice(10, 40);
-  console.log(paragraphs);
+  //console.log(paragraphs);
 
   let newFile = [];
   let isStart = false;
@@ -32,6 +41,8 @@ async function parseMarkdownFileOld(paragraphsOld) {
     tag = null;
     toTranslate = [];
   }
+
+  function resetStart(paragraph) {}
 
   async function translate() {
     const closeTag = toTranslate.pop();
@@ -49,39 +60,37 @@ async function parseMarkdownFileOld(paragraphsOld) {
   for (let key in paragraphs) {
     let paragraph = paragraphs[key];
     //console.log("interation", key, { isStart, tag, paragraph });
-    // is process and even not words
     if (isStart) toTranslate.push(paragraph);
 
     if (!isStart) newFile.push(paragraph);
-
     // No matter where - matter isStart and (header OR another any tag)
     if (
       isStart &&
       (isHeader(paragraph) ||
-        //isCloseTag(paragraph, tag) ||
         isCloseAnyTag(paragraph) ||
-        isOpenTag(paragraph))
+        isOpenAnyTag(paragraph))
     ) {
       if (hasText(toTranslate)) {
+        //console.log({ key });
         await translate();
+
+        await writeFile(fileNameOutput, newFile);
       } else {
         newFile = [...newFile, ...toTranslate];
       }
 
       reset();
 
-      isStart = true;
+      if (!isCodeTag(paragraph)) isStart = true;
     }
 
     if (isOpenTag(paragraph)) {
       tag = isOpenTag(paragraph);
-      //console.log({ tag });
-      isStart = true;
+
+      if (!isCodeTag(paragraph)) isStart = true;
     }
   }
-
   // console.log("newFile", newFile);
-
   return newFile;
 }
 

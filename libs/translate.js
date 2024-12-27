@@ -1,10 +1,16 @@
 const { translator } = require("./data");
 
 async function translateParagraphs(paragraphs) {
-  const text = paragraphs.join("");
-  //const translatedText = await translator.translateText(text, "EN", "RU");
-  const translatedText = "translated";
-  return ["\r\n", translatedText, "\r\n"];
+  try {
+    const text = paragraphs.join("");
+    //const translatedText = await translator.translateText(text, "EN", "RU");
+    const translatedText = text;
+    return translatedText;
+  } catch (error) {
+    console.log("tried translating text:");
+    console.log(text);
+    console.log(error);
+  }
 }
 
 module.exports = {

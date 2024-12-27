@@ -15,11 +15,11 @@ async function readMdFileOld(fileName) {
   try {
     const content = await getFileContent(fileName);
     const paragraphs = await parseMarkdownForParagraph(content);
-    const result = await parseMarkdownFileOld(paragraphs);
+    const translatedMd = await parseMarkdownFileOld(paragraphs, fileNameOutput);
 
-    await writeFile(fileNameOutput, result);
+    //await writeFile(fileNameOutput, result);
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
   }
 }
 
