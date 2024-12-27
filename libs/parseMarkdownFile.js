@@ -8,6 +8,7 @@ const TAGS = [
   "Recap",
   "DeepDive",
   "Sandpack",
+  "LearnMore",
 ];
 const CODE_TAGS = ["Sandpack"];
 const EXCLUDES = ["[comment]", "[TODO]"];

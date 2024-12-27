@@ -2,8 +2,9 @@ const { writeFile } = require("node:fs/promises");
 const { getFileContent } = require("./libs/getFileContent");
 const { topics } = require("./md/learn");
 
-const fileName = `./md/learn/${topics.learn.ui_tree}.md`;
-const fileNameOutput = `./md/output/learn/${topics.learn.ui_tree}.md`;
+fileName = topics.learn.describing;
+const file = `./md/learn/${fileName}.md`;
+const fileOutput = `./md/output/learn/${fileName}.md`;
 
 const {
   //parseMarkdownFile,
@@ -13,12 +14,12 @@ const {
 
 async function readMdFileOld(fileName) {
   try {
-    const content = await getFileContent(fileName);
+    const content = await getFileContent(file);
     const paragraphs = await parseMarkdownForParagraph(content);
-    const translatedMd = await parseMarkdownFileOld(paragraphs, fileNameOutput);
+    const translatedMd = await parseMarkdownFileOld(paragraphs, fileOutput);
 
     //await writeFile(paragraphs, result);
-    await writeFile(fileNameOutput, translatedMd);
+    await writeFile(fileOutput, translatedMd);
   } catch (err) {
     console.log(err.message);
     console.log(err);
