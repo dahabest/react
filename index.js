@@ -18,7 +18,7 @@ async function readMdFileOld(fileName) {
     const translatedMd = await parseMarkdownFileOld(paragraphs, fileNameOutput);
 
     //await writeFile(paragraphs, result);
-    //await writeFile(fileNameOutput, translatedMd);
+    await writeFile(fileNameOutput, translatedMd);
   } catch (err) {
     console.log(err.message);
     console.log(err);
@@ -26,3 +26,8 @@ async function readMdFileOld(fileName) {
 }
 
 readMdFileOld(fileName);
+// const header = "## Your UI as a tree {/*your-ui-as-a-tree*/}";
+
+// const rHeader = /(?<=^#{1,4} )[\s\S]*(?={)/gm;
+
+// console.log(header.match(rHeader));

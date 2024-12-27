@@ -1,72 +1,76 @@
-const { markdown: md } = require("markdown");
 const { translateParagraphs } = require("./translate");
 const { writeFile } = require("node:fs/promises");
 
-TAGS = ["Intro", "YouWillLearn", "Diagram", "Recap", "DeepDive", "Sandpack"];
-CLOSE_TAGS = [...TAGS, "Sandpack"];
-CODE_TAGS = ["Sandpack"];
-EXCLUDES = ["[comment]", "[TODO]"];
-OPEN_TAGS = TAGS.map((tag) => `<${tag}>`);
+const TAGS = [
+  "Intro",
+  "YouWillLearn",
+  "Diagram",
+  "Recap",
+  "DeepDive",
+  "Sandpack",
+];
+const CODE_TAGS = ["Sandpack"];
+const EXCLUDES = ["[comment]", "[TODO]"];
 
 const rWord = /.*\w+/i;
+const rHeader = /(?<=^#{1,4} )[\s\S]*(?={)/gm;
 
 const isOpenAnyTag = (paragraph) =>
   TAGS.find((tag) => paragraph.startsWith(`<${tag}`));
 
-const isCloseTag = (paragraph, tag) => paragraph.includes(`</${tag}>`);
 const isCloseAnyTag = (paragraph) =>
   TAGS.find((tag) => paragraph.includes(`</${tag}`));
 
 const isHeader = (paragraph) => paragraph.startsWith("##");
 
-const isCodeTag = (paragraph) =>
+const isCodeOpenTag = (paragraph) =>
   CODE_TAGS.find((tag) => paragraph.startsWith(`<${tag}`));
 
 const isOpenTag = (paragraph) =>
-  isOpenAnyTag(paragraph) && !isCodeTag(paragraph);
+  isOpenAnyTag(paragraph) && !isCodeOpenTag(paragraph);
 
-const isNotExcludes = (paragraph) =>
-  !EXCLUDES.find((e) => paragraph.includes(e));
+const isExclude = (paragraph) => EXCLUDES.find((e) => paragraph.startsWith(e));
 
 /* IsStart is opened tag or header or closed tag
 IsStart and (isHeader or isOpenTag or isCloseTag) and 
 to translate.join().is word then need translate */
 async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
-  let paragraphs = paragraphsOld; //.slice(10, 40);
+  let paragraphs = paragraphsOld.slice(3);
   //console.log(paragraphs);
 
-  let newFile = [];
-  let isStart = false;
-  let tag = null;
+  let newFile = paragraphsOld.slice(0, 3);
+  let isStart = true;
   let toTranslate = [];
+  let header = "";
 
   function reset() {
     isStart = false;
-    tag = null;
     toTranslate = [];
+    header = "";
   }
   async function translate() {
-    const closeTag = toTranslate.pop();
+    const last = toTranslate.pop();
+    const wrappedEngParagraphs = wrapEngParagraphs(toTranslate, header);
     const translatedParagraphs = await translateParagraphs(toTranslate);
-    const wrappedEngParagraphs = wrapEngParagraphs(toTranslate);
 
     newFile = [
       ...newFile,
       ...translatedParagraphs,
       ...wrappedEngParagraphs,
-      closeTag,
+      last,
     ];
   }
 
   for (let key in paragraphs) {
     let paragraph = paragraphs[key];
     //console.log("interation", key, { isStart, tag, paragraph });
-    if (isStart && isNotExcludes(paragraph)) {
-      toTranslate.push(paragraph);
-    }
+
+    if (isExclude(paragraph)) continue;
+
+    if (isStart) toTranslate.push(paragraph);
 
     if (!isStart) newFile.push(paragraph);
-    // No matter where - matter isStart and (header OR another any tag)
+
     if (
       isStart &&
       (isHeader(paragraph) ||
@@ -83,17 +87,22 @@ async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
       }
 
       reset();
-
-      if (!isCodeTag(paragraph)) isStart = true;
+      if (!isCodeOpenTag(paragraph)) isStart = true;
     }
 
-    if (isOpenTag(paragraph)) {
-      tag = isOpenTag(paragraph);
+    if (
+      isOpenTag(paragraph) ||
+      isCloseAnyTag(paragraph) ||
+      isHeader(paragraph)
+    ) {
+      isStart = true;
+    }
 
-      if (!isCodeTag(paragraph)) isStart = true;
+    if (isHeader(paragraph)) {
+      header = paragraph.match(rHeader);
     }
   }
-  // console.log("newFile", newFile);
+
   return newFile;
 }
 
@@ -106,22 +115,13 @@ function hasText(toTranslate) {
   });
 }
 
-/* const isCloseTagAndHeader = (paragraph, tag) => {
-  //const isClose = TAGS.find((tag) => paragraph.startsWith(`</${tag}>`));
-  return tag === "closed" && isHeader(paragraph);
-}; */
-
-//console.log(newFile);
-//newFile.push(ps[key]);
-//let isWord = ps[key].match(rWord);
-//const result = /(?<=^# .*?\n)([\s\S]*?)(?=\n<[^>]+>)/.exec(content);
-
-function wrapEngParagraphs(paragraphs) {
+function wrapEngParagraphs(toTranslate, header) {
   return [
     "\r\n",
     "<details>\r\n",
     "<summary><small>(eng)</small></summary>\r\n",
-    ...paragraphs,
+    ...(header ? [`\r\n<b>${header}</b>\r\n`] : []),
+    ...toTranslate,
     "</details>\r\n",
     "\r\n",
   ];
@@ -144,3 +144,29 @@ module.exports = {
   parseMarkdownFileOld,
   parseMarkdownForParagraph,
 };
+
+//const isExcludes = (paragraphs) => paragraphs.find((p) => isExclude(p));
+// if (isExclude(paragraph)) {
+//   newFile.push(paragraph);
+//   continue;
+// }
+
+// if (isOpenTag(paragraph)) {
+//   tag = isOpenTag(paragraph);
+
+//   if (!isCodeTag(paragraph)) isStart = true;
+// }
+
+//const CLOSE_TAGS = [...TAGS, "Sandpack"];
+//const OPEN_TAGS = TAGS.map((tag) => `<${tag}>`);
+
+//const isCloseTag = (paragraph, tag) => paragraph.includes(`</${tag}>`);
+/* const isCloseTagAndHeader = (paragraph, tag) => {
+  //const isClose = TAGS.find((tag) => paragraph.startsWith(`</${tag}>`));
+  return tag === "closed" && isHeader(paragraph);
+}; */
+
+//console.log(newFile);
+//newFile.push(ps[key]);
+//let isWord = ps[key].match(rWord);
+//const result = /(?<=^# .*?\n)([\s\S]*?)(?=\n<[^>]+>)/.exec(content);
