@@ -15,7 +15,7 @@ const isHeader = (paragraph) => paragraph.startsWith("##");
 IsStart and (isHeader or isOpenTag or isCloseTag) and 
 to translate.join().is word then need transkate */
 async function parseMarkdownFileOld(paragraphsOld) {
-  let paragraphs = paragraphsOld.slice(10, 40);
+  let paragraphs = paragraphsOld; //.slice(10, 40);
   console.log(paragraphs);
 
   let newFile = [];
@@ -34,7 +34,7 @@ async function parseMarkdownFileOld(paragraphsOld) {
     const translatedParagraphs = translateParagraphs(toTranslate);
     const wrappedEngParagraphs = wrapEngParagraphs(toTranslate);
 
-    return [
+    newFile = [
       ...newFile,
       ...translatedParagraphs,
       ...wrappedEngParagraphs,
@@ -46,23 +46,23 @@ async function parseMarkdownFileOld(paragraphsOld) {
     let paragraph = paragraphs[key];
     //console.log("interation", key, { isStart, tag, paragraph });
     // is process and even not words
-    if (isStart) {
-      toTranslate.push(paragraph);
-    }
+    if (isStart) toTranslate.push(paragraph);
 
-    if (!isStart) {
-      newFile.push(paragraph);
-    }
+    if (!isStart) newFile.push(paragraph);
 
     // No matter where - matter isStart and (header OR another any tag)
     if (
       isStart &&
-      hasText(toTranslate) &&
       (isHeader(paragraph) ||
         isCloseTag(paragraph, tag) ||
         isOpenTag(paragraph))
     ) {
-      translate();
+      if (hasText(toTranslate)) {
+        translate();
+      } else {
+        newFile = [...newFile, ...toTranslate];
+      }
+
       reset();
 
       isStart = true;
@@ -90,9 +90,11 @@ async function parseMarkdownFileOld(paragraphsOld) {
   return newFile;
 }
 
-function hasText(paragraphs) {
+// check toTranslate except the last tag (#, <>, /<>)
+function hasText(toTranslate) {
+  const paragraphs = toTranslate.slice(0, toTranslate.length - 1);
   return paragraphs.some((paragraph) => {
-    console.log(paragraph, { isWord: paragraph.match(rWord) });
+    //console.log(paragraph, { isWord: paragraph.match(rWord) });
     return paragraph.match(rWord);
   });
 }
