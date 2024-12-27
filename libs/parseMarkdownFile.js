@@ -9,6 +9,9 @@ const TAGS = [
   "DeepDive",
   "Sandpack",
   "LearnMore",
+  "Pitfall",
+  "Challenges",
+  "Solution",
 ];
 const CODE_TAGS = ["Sandpack"];
 const EXCLUDES = ["[comment]", "[TODO]"];
@@ -36,13 +39,18 @@ const isExclude = (paragraph) => EXCLUDES.find((e) => paragraph.startsWith(e));
 IsStart and (isHeader or isOpenTag or isCloseTag) and 
 to translate.join().is word then need translate */
 async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
-  let paragraphs = paragraphsOld.slice(3);
+  let paragraphs = [...paragraphsOld.slice(3), "\r\n"];
   //console.log(paragraphs);
 
   let newFile = paragraphsOld.slice(0, 3);
   let isStart = true;
   let toTranslate = [];
   let header = "";
+
+  const isEnd = (key) => {
+    console.log({ key, l: paragraphs.length - 1, l: paragraphs.length });
+    return key == paragraphs.length - 1;
+  };
 
   function reset() {
     isStart = false;
@@ -76,17 +84,16 @@ async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
       isStart &&
       (isHeader(paragraph) ||
         isCloseAnyTag(paragraph) ||
-        isOpenAnyTag(paragraph))
+        isOpenAnyTag(paragraph) ||
+        isEnd(key))
     ) {
       if (hasText(toTranslate)) {
         //console.log({ key });
         await translate();
-
         await writeFile(fileNameOutput, newFile);
       } else {
         newFile = [...newFile, ...toTranslate];
       }
-
       reset();
       if (!isCodeOpenTag(paragraph)) isStart = true;
     }
