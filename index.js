@@ -3,7 +3,7 @@ const { getFileContent } = require("./libs/getFileContent");
 const { topics } = require("./md/learn");
 
 const fileName = `./md/learn/${topics.learn.ui_tree}.md`;
-const fileNameOutput = `./md/learn/output/${topics.learn.ui_tree}.md`;
+const fileNameOutput = `./md/output/learn/${topics.learn.ui_tree}.md`;
 
 const {
   //parseMarkdownFile,
@@ -17,7 +17,7 @@ async function readMdFileOld(fileName) {
     const paragraphs = await parseMarkdownForParagraph(content);
     const result = await parseMarkdownFileOld(paragraphs);
 
-    await writeFile("./output/test.md", result);
+    await writeFile(fileNameOutput, result);
   } catch (err) {
     console.log(err.message);
   }
