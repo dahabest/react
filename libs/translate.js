@@ -3,8 +3,8 @@ const { translator } = require("./data");
 async function translateParagraphs(paragraphs) {
   try {
     const text = paragraphs.join("");
-    //const translatedText = await translator.translateText(text, "EN", "RU");
-    const translatedText = text;
+    const translatedResult = await translator.translateText(text, "EN", "RU");
+    const translatedText = translatedResult.text;
     return translatedText;
   } catch (error) {
     console.log("tried translating text:");

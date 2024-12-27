@@ -20,6 +20,7 @@ async function readMdFileOld(fileName) {
     //await writeFile(paragraphs, result);
     //await writeFile(fileNameOutput, translatedMd);
   } catch (err) {
+    console.log(err.message);
     console.log(err);
   }
 }

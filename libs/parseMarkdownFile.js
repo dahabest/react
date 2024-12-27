@@ -45,9 +45,6 @@ async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
     tag = null;
     toTranslate = [];
   }
-
-  function resetStart(paragraph) {}
-
   async function translate() {
     const closeTag = toTranslate.pop();
     const translatedParagraphs = await translateParagraphs(toTranslate);
