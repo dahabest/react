@@ -5,6 +5,7 @@ const { writeFile } = require("node:fs/promises");
 TAGS = ["Intro", "YouWillLearn", "Diagram", "Recap", "DeepDive", "Sandpack"];
 CLOSE_TAGS = [...TAGS, "Sandpack"];
 CODE_TAGS = ["Sandpack"];
+EXCLUDES = ["[comment]", "[TODO]"];
 OPEN_TAGS = TAGS.map((tag) => `<${tag}>`);
 
 const rWord = /.*\w+/i;
@@ -23,6 +24,9 @@ const isCodeTag = (paragraph) =>
 
 const isOpenTag = (paragraph) =>
   isOpenAnyTag(paragraph) && !isCodeTag(paragraph);
+
+const isNotExcludes = (paragraph) =>
+  !EXCLUDES.find((e) => paragraph.includes(e));
 
 /* IsStart is opened tag or header or closed tag
 IsStart and (isHeader or isOpenTag or isCloseTag) and 
@@ -60,7 +64,9 @@ async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
   for (let key in paragraphs) {
     let paragraph = paragraphs[key];
     //console.log("interation", key, { isStart, tag, paragraph });
-    if (isStart) toTranslate.push(paragraph);
+    if (isStart && isNotExcludes(paragraph)) {
+      toTranslate.push(paragraph);
+    }
 
     if (!isStart) newFile.push(paragraph);
     // No matter where - matter isStart and (header OR another any tag)
@@ -128,7 +134,7 @@ async function parseMarkdownForParagraph(content) {
   let regex;
 
   regex = /^#{1,6}\s?([^\n]+)/gm;
-  //paragraph
+  //paragraphs
   regex = /([^\n]+\n?)/g;
 
   const result = content.match(regex);

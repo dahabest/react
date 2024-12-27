@@ -17,7 +17,8 @@ async function readMdFileOld(fileName) {
     const paragraphs = await parseMarkdownForParagraph(content);
     const translatedMd = await parseMarkdownFileOld(paragraphs, fileNameOutput);
 
-    //await writeFile(fileNameOutput, result);
+    //await writeFile(paragraphs, result);
+    //await writeFile(fileNameOutput, translatedMd);
   } catch (err) {
     console.log(err);
   }
