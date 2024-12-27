@@ -1,5 +1,10 @@
 const { writeFile } = require("node:fs/promises");
 const { getFileContent } = require("./libs/getFileContent");
+const { topics } = require("./md/learn");
+
+const fileName = `./md/learn/${topics.learn.ui_tree}.md`;
+const fileNameOutput = `./md/learn/output/${topics.learn.ui_tree}.md`;
+
 const {
   //parseMarkdownFile,
   parseMarkdownFileOld,
@@ -18,4 +23,4 @@ async function readMdFileOld(fileName) {
   }
 }
 
-readMdFileOld("./md/test.md");
+readMdFileOld(fileName);

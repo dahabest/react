@@ -1,4 +1,5 @@
 const { markdown: md } = require("markdown");
+const { translateParagraphs } = require("./translate");
 
 TAGS = ["Intro", "YouWillLearn", "Diagram", "Recap", "DeepDive"];
 OPEN_TAGS = TAGS.map((tag) => `<${tag}>`);
@@ -32,9 +33,9 @@ async function parseMarkdownFileOld(paragraphsOld) {
     toTranslate = [];
   }
 
-  function translate() {
+  async function translate() {
     const closeTag = toTranslate.pop();
-    const translatedParagraphs = translateParagraphs(toTranslate);
+    const translatedParagraphs = await translateParagraphs(toTranslate);
     const wrappedEngParagraphs = wrapEngParagraphs(toTranslate);
 
     newFile = [
@@ -62,7 +63,7 @@ async function parseMarkdownFileOld(paragraphsOld) {
         isOpenTag(paragraph))
     ) {
       if (hasText(toTranslate)) {
-        translate();
+        await translate();
       } else {
         newFile = [...newFile, ...toTranslate];
       }
@@ -112,10 +113,6 @@ function wrapEngParagraphs(paragraphs) {
     "</details>\r\n",
     "\r\n",
   ];
-}
-
-function translateParagraphs(paragraphs) {
-  return ["\r\n", "translated\r\n"];
 }
 
 async function parseMarkdownForParagraph(content) {
