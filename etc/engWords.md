@@ -31,3 +31,9 @@ fragment /ˈfrægmənt/ фрагмент
 Dom /dɒm/ Document Object Model - Объектная модель документа
 
 null /nʌl/ adj нулевой, пустой, нуль, обнулять
+
+SVG /es vi ʤiː/
+
+width /wɪdθ/ ширина
+
+height /haɪt/ высота
