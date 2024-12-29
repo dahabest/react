@@ -15,13 +15,13 @@ async function translateParagraphs(toTranslate) {
       let text = allParagraphs.pop();
 
       if ((current.startsWith("```js") || isTheEnd(key)) && isWord(text)) {
-        text = `\r\ntranslated(${text})\r\n`;
-        /* const translatedResult = await translator.translateText(
-            text,
-            "EN",
-            "RU"
-          );
-          text = translatedResult.text; */
+        //text = `\r\ntranslated(${text})\r\n`;
+        const translatedResult = await translator.translateText(
+          text,
+          "EN",
+          "RU"
+        );
+        text = translatedResult.text;
       }
       if (current.startsWith("```js")) {
         allParagraphs.push(text, current);
