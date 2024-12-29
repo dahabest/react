@@ -4,36 +4,37 @@ const rWord = /.*\w+/i;
 
 async function translateParagraphs(toTranslate) {
   //console.log(toTranslate);
-  const isTheEnd = (index) => index === toTranslate.length - 1;
+  const isTheEnd = (index) => Number(index) === toTranslate.length - 1;
   const isWord = (paragraph) => paragraph.match(rWord);
   try {
-    const translatedParagraphs = toTranslate.reduce(
-      (prev, current, currentIndex) => {
-        let text = prev.pop();
+    let allParagraphs = [""];
+    toTranslate.push("");
 
-        if (
-          (current.startsWith("```js") || isTheEnd(currentIndex)) &&
-          isWord(text)
-        ) {
-          text = `\r\ntranslated(${text})\r\n`;
-          //const translatedResult = await translator.translateText(text, "EN", "RU");
-          //const translatedText = translatedResult.text;
-        }
+    for (const key in toTranslate) {
+      const current = toTranslate[key];
+      let text = allParagraphs.pop();
 
-        if (current.startsWith("```js")) {
-          return [...prev, text, current];
-        }
-        if (current.startsWith("```")) {
-          return [...prev, `${text}${current}`, ""];
-        }
-        return [...prev, `${text}${current}`];
-      },
-      [""]
-    );
-
-    /*console.log("translatedParagraphs\n");
-    console.log(translatedParagraphs); */
-    return translatedParagraphs;
+      if ((current.startsWith("```js") || isTheEnd(key)) && isWord(text)) {
+        text = `\r\ntranslated(${text})\r\n`;
+        /* const translatedResult = await translator.translateText(
+            text,
+            "EN",
+            "RU"
+          );
+          text = translatedResult.text; */
+      }
+      if (current.startsWith("```js")) {
+        allParagraphs.push(text, current);
+        continue;
+      }
+      if (current.startsWith("```")) {
+        allParagraphs.push(`${text}${current}`, "");
+        continue;
+      }
+      allParagraphs.push(`${text}${current}`);
+    }
+    //console.log(allParagraphs);
+    return allParagraphs;
   } catch (error) {
     console.log("tried translating text:");
     console.log(toTranslate);
@@ -45,7 +46,31 @@ module.exports = {
   translateParagraphs,
 };
 
-/* const translatedParagraphs = translatedText?.text
-  .split("\r\n")
-  .filter(Boolean)
-  .map((item) => `${item}\r\n`); */
+// const translatedParagraphs = toTranslate.reduce(
+//   (prev, current, currentIndex) => {
+//     let text = prev.pop();
+
+//     if (
+//       (current.startsWith("```js") || isTheEnd(currentIndex)) &&
+//       isWord(text)
+//     ) {
+//       text = `\r\ntranslated(${text})\r\n`;
+//       /* const translatedResult = await translator.translateText(
+//         text,
+//         "EN",
+//         "RU"
+//       );
+//       text = translatedResult.text; */
+//     }
+
+//     if (current.startsWith("```js")) {
+//       return [...prev, text, current];
+//     }
+//     if (current.startsWith("```")) {
+//       return [...prev, `${text}${current}`, ""];
+//     }
+//     return [...prev, `${text}${current}`];
+//   },
+//   [""]
+// );
+// return translatedParagraphs;

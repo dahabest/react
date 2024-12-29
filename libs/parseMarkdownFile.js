@@ -109,6 +109,7 @@ async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
     }
   }
 
+  //console.log(newFile);
   return newFile;
 }
 
