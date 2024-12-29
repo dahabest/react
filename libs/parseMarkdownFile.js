@@ -47,10 +47,7 @@ async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
   let toTranslate = [];
   let header = "";
 
-  const isEnd = (key) => {
-    console.log({ key, l: paragraphs.length - 1, l: paragraphs.length });
-    return key == paragraphs.length - 1;
-  };
+  const isEnd = (key) => key == paragraphs.length - 1;
 
   function reset() {
     isStart = false;

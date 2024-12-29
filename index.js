@@ -28,8 +28,10 @@ async function readMdFileOld(fileName) {
 }
 
 readMdFileOld(fileName);
-// const header = "## Your UI as a tree {/*your-ui-as-a-tree*/}";
+/* (async function () {
+  const text = await getFileContent(file);
+  const rCode = //
+    console.log(text.match(rCode));
+})(); */
 
 // const rHeader = /(?<=^#{1,4} )[\s\S]*(?={)/gm;
-
-// console.log(header.match(rHeader));

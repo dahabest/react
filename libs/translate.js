@@ -1,15 +1,36 @@
 const { translator } = require("./data");
 
-async function translateParagraphs(paragraphs) {
+async function translateParagraphs(toTranslate) {
+  //console.log(toTranslate);
+  const isTheEnd = (index) => index === toTranslate.length - 1;
   try {
-    const text = paragraphs.join("");
-    //const translatedResult = await translator.translateText(text, "EN", "RU");
-    //const translatedText = translatedResult.text;
-    const translatedText = "\r\ntranslated\r\n";
-    return translatedText;
+    const translatedParagraphs = toTranslate.reduce(
+      (prev, current, currentIndex) => {
+        let text = prev.pop();
+
+        if (current.startsWith("```js") || isTheEnd(currentIndex)) {
+          text = `\r\ntranslated(${text})\r\n`;
+          //const translatedResult = await translator.translateText(text, "EN", "RU");
+          //const translatedText = translatedResult.text;
+        }
+
+        if (current.startsWith("```js")) {
+          return [...prev, text, current];
+        }
+        if (current.startsWith("```")) {
+          return [...prev, `${text}${current}`, ""];
+        }
+        return [...prev, `${text}${current}`];
+      },
+      [""]
+    );
+
+    /*console.log("translatedParagraphs\n");
+    console.log(translatedParagraphs); */
+    return translatedParagraphs;
   } catch (error) {
     console.log("tried translating text:");
-    console.log(text);
+    console.log(toTranslate);
     console.log(error);
   }
 }
