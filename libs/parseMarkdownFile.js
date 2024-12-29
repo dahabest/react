@@ -12,6 +12,7 @@ const TAGS = [
   "Pitfall",
   "Challenges",
   "Solution",
+  "Note",
 ];
 const CODE_TAGS = ["Sandpack"];
 const EXCLUDES = ["[comment]", "[TODO]"];
@@ -125,7 +126,7 @@ function wrapEngParagraphs(toTranslate, header) {
     "\r\n",
     "<details>\r\n",
     "<summary><small>(eng)</small></summary>\r\n",
-    ...(header ? [`\r\n<b>${header}</b>\r\n`] : []),
+    ...(header ? [`\r\n<b>${header}:</b>\r\n`] : []),
     ...toTranslate,
     "</details>\r\n",
     "\r\n",

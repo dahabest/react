@@ -1,14 +1,20 @@
 const { translator } = require("./data");
 
+const rWord = /.*\w+/i;
+
 async function translateParagraphs(toTranslate) {
   //console.log(toTranslate);
   const isTheEnd = (index) => index === toTranslate.length - 1;
+  const isWord = (paragraph) => paragraph.match(rWord);
   try {
     const translatedParagraphs = toTranslate.reduce(
       (prev, current, currentIndex) => {
         let text = prev.pop();
 
-        if (current.startsWith("```js") || isTheEnd(currentIndex)) {
+        if (
+          (current.startsWith("```js") || isTheEnd(currentIndex)) &&
+          isWord(text)
+        ) {
           text = `\r\ntranslated(${text})\r\n`;
           //const translatedResult = await translator.translateText(text, "EN", "RU");
           //const translatedText = translatedResult.text;
