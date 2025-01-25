@@ -12,7 +12,7 @@ side effect /saɪd ɪˈfekt/ побочные эффект, побочное д�
 
 XSS /eks es es/ Cross-site scripting - межсайтовый скриптинг
 
-XML /eks.emˈel/ eXtensible Markup Language - «расширяемый язык разметки»
+XML /eks.emˈel/ eXtensible Markup Language /ɪksˈtensəbl ˈmɑːkʌp ˈlæŋgwɪʤ/ - «расширяемый язык разметки»
 
 JSX /dgei es eks/ JavaScript XML - расширение синтаксиса JS
 
@@ -37,3 +37,15 @@ SVG /es vi ʤiː/
 width /wɪdθ/ ширина
 
 height /haɪt/ высота
+
+JavaScript /ˈʤɑːvəskrɪpt/
+
+HTML /eɪʧ ti em el/ - HyperText Markup Language /haɪpətekst ˈmɑːkʌp ˈlæŋgwɪʤ/ - «язык гипертекстовой разметки»
+
+footer /fʊtə/ нижняя сноска, подвал, нижний колонтитул
+
+CSS /siː es es/ - Cascading Style Sheets /kæˈskeɪdɪŋ staɪl ʃiːt/ - Каскадные таблицы стилей
+
+API / eɪ.piˈaɪ / - Application Programming Interface / æplɪˈkeɪʃn ˈprəʊgræmɪŋ ˈɪntəfeɪs / - Интерфейс прикладного программирования
+
+Virtual / ˈvɜː.tʃu.əl / виртуальный
