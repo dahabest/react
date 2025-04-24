@@ -127,7 +127,7 @@ function wrapEngParagraphs(toTranslate, header) {
     "\r\n",
     "<details>\r\n",
     "<summary><small>(eng)</small></summary>\r\n",
-    ...(header ? [`\r\n<b>${header}:</b>\r\n`] : []),
+    ...(header ? [`\r\n<b>${header}:</b>`] : []),
     ...toTranslate,
     "</details>\r\n",
     "\r\n",
