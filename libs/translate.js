@@ -2,7 +2,7 @@ const { translator } = require("./data");
 
 const rWord = /.*\w+/i;
 
-async function translateParagraphs(toTranslate) {
+async function translateParagraphs(toTranslate, header) {
   //console.log(toTranslate);
   const isTheEnd = (index) => Number(index) === toTranslate.length - 1;
   const isWord = (paragraph) => paragraph.match(rWord);
@@ -15,12 +15,6 @@ async function translateParagraphs(toTranslate) {
     for (const key in toTranslate) {
       const current = toTranslate[key];
       let text = allParagraphs.pop();
-
-      if (isHeader(current)) {
-        const headerTranslated = await translateText(current);
-        allParagraphs.push(text, headerTranslated);
-        continue;
-      }
 
       if ((current.startsWith("```js") || isTheEnd(key)) && isWord(text)) {
         //text = `\r\ntranslated(${text})\r\n`;
@@ -46,11 +40,18 @@ async function translateParagraphs(toTranslate) {
 }
 
 async function translateText(text) {
-  return `TRANSLATED ${text} TRANSLATED`;
+  return `TRANSLATED( ${text} ) TRANSLATED`;
   // const translatedResult = await translator.translateText(text, "EN", "RU");
   // return translatedResult.text;
 }
 
 module.exports = {
   translateParagraphs,
+  translateText,
 };
+
+/* if (isHeader(current)) {
+  const headerTranslated = await translateText(current);
+  allParagraphs.push(text, headerTranslated);
+  continue;
+} */

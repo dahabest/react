@@ -47,7 +47,6 @@ async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
   let isStart = true;
   let toTranslate = [];
   let header = "";
-  let headerTranslated = "";
 
   const isEnd = (key) => key == paragraphs.length - 1;
 
@@ -57,9 +56,15 @@ async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
     header = "";
   }
   async function translate() {
-    const last = toTranslate.pop();
+    let last = toTranslate.pop(); // Delete paragraph from
     const wrappedEngParagraphs = wrapEngParagraphs(toTranslate, header);
     const translatedParagraphs = await translateParagraphs(toTranslate);
+
+    const headerToTranslate = last.match(rHeader);
+    if (headerToTranslate?.length > 0) {
+      const headerTranslated = await translateText(headerToTranslate[0]);
+      last = last.replace(headerToTranslate, headerTranslated);
+    }
 
     newFile = [
       ...newFile,
@@ -72,6 +77,11 @@ async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
   for (let key in paragraphs) {
     let paragraph = paragraphs[key];
     //console.log("interation", key, { isStart, tag, paragraph });
+
+    // debug
+    if (isHeader(paragraph)) {
+      const hi = 1;
+    }
 
     if (isExclude(paragraph)) continue;
 
@@ -87,7 +97,6 @@ async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
         isEnd(key))
     ) {
       if (hasText(toTranslate)) {
-        //console.log({ key });
         await translate();
         await writeFile(fileNameOutput, newFile);
       } else {
@@ -119,9 +128,13 @@ function hasText(toTranslate) {
   const paragraphs = toTranslate.slice(0, toTranslate.length - 1);
   return paragraphs.some((paragraph) => {
     //console.log(paragraph, { isWord: paragraph.match(rWord) });
-    return paragraph.match(rWord) || paragraph.match(rHeader);
+    return paragraph.match(rWord);
   });
 }
+
+/* function hasHeader(toTranslate) {
+  return toTranslate.some(isHeader);
+} */
 
 function wrapEngParagraphs(toTranslate, header) {
   return [

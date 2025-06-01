@@ -11,11 +11,4 @@
 
 ### error
 
-Need to comment for dev and uncomment for dev
-
-```js
-// basePath: '/ru.react.doc', // temp
-// assetPrefix: isProd
-//   ? '/ru.react.doc/'
-//   : 'http://localhost:3000/ru.react.doc/',
-```
+Use domain for dev: 'http://localhost:3000/ru.react.doc/'
