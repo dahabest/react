@@ -1,4 +1,3 @@
-const { translateParagraphs, translateText } = require("./translate");
 const { writeFile } = require("node:fs/promises");
 
 const TAGS = [
@@ -71,7 +70,6 @@ async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
 
   for (let key in paragraphs) {
     let paragraph = paragraphs[key];
-    //console.log("interation", key, { isStart, tag, paragraph });
 
     if (isExclude(paragraph)) continue;
 
@@ -110,7 +108,6 @@ async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
     }
   }
 
-  //console.log(newFile);
   return newFile;
 }
 
@@ -118,8 +115,7 @@ async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
 function hasText(toTranslate) {
   const paragraphs = toTranslate.slice(0, toTranslate.length - 1);
   return paragraphs.some((paragraph) => {
-    //console.log(paragraph, { isWord: paragraph.match(rWord) });
-    return paragraph.match(rWord) || paragraph.match(rHeader);
+    return paragraph.match(rWord);
   });
 }
 
@@ -139,7 +135,6 @@ async function parseMarkdownForParagraph(content) {
   let regex;
 
   regex = /^#{1,6}\s?([^\n]+)/gm;
-  //paragraphs
   regex = /([^\n]+\n?)/g;
 
   const result = content.match(regex);
@@ -147,34 +142,44 @@ async function parseMarkdownForParagraph(content) {
   return result;
 }
 
-module.exports = {
-  //parseMarkdownFile,
-  parseMarkdownFileOld,
-  parseMarkdownForParagraph,
-};
+const rWord = /.*\w+/i;
 
-//const isExcludes = (paragraphs) => paragraphs.find((p) => isExclude(p));
-// if (isExclude(paragraph)) {
-//   newFile.push(paragraph);
-//   continue;
-// }
+async function translateParagraphs(toTranslate) {
+  //console.log(toTranslate);
+  const isTheEnd = (index) => Number(index) === toTranslate.length - 1;
+  const isWord = (paragraph) => paragraph.match(rWord);
+  try {
+    let allParagraphs = [""];
+    toTranslate.push("");
 
-// if (isOpenTag(paragraph)) {
-//   tag = isOpenTag(paragraph);
+    for (const key in toTranslate) {
+      const current = toTranslate[key];
+      let text = allParagraphs.pop();
 
-//   if (!isCodeTag(paragraph)) isStart = true;
-// }
-
-//const CLOSE_TAGS = [...TAGS, "Sandpack"];
-//const OPEN_TAGS = TAGS.map((tag) => `<${tag}>`);
-
-//const isCloseTag = (paragraph, tag) => paragraph.includes(`</${tag}>`);
-/* const isCloseTagAndHeader = (paragraph, tag) => {
-  //const isClose = TAGS.find((tag) => paragraph.startsWith(`</${tag}>`));
-  return tag === "closed" && isHeader(paragraph);
-}; */
-
-//console.log(newFile);
-//newFile.push(ps[key]);
-//let isWord = ps[key].match(rWord);
-//const result = /(?<=^# .*?\n)([\s\S]*?)(?=\n<[^>]+>)/.exec(content);
+      if ((current.startsWith("```js") || isTheEnd(key)) && isWord(text)) {
+        //text = `\r\ntranslated(${text})\r\n`;
+        const translatedResult = await translator.translateText(
+          text,
+          "EN",
+          "RU"
+        );
+        text = translatedResult.text;
+      }
+      if (current.startsWith("```js")) {
+        allParagraphs.push(text, current);
+        continue;
+      }
+      if (current.startsWith("```")) {
+        allParagraphs.push(`${text}${current}`, "");
+        continue;
+      }
+      allParagraphs.push(`${text}${current}`);
+    }
+    //console.log(allParagraphs);
+    return allParagraphs;
+  } catch (error) {
+    console.log("tried translating text:");
+    console.log(toTranslate);
+    console.log(error);
+  }
+}

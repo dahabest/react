@@ -10,3 +10,12 @@
 1.7 Рендеринг списков - rendering-lists.md
 1.8 Поддержание чистоты компонентов - keeping-components-pure.md
 1.9 Ваш UI как дерево - understanding-your-ui-as-a-tree.md
+
+2. Добавление интерактивности - -
+   2.1 Реакция на события - -
+   2.2 State: A Component's Memory - state-a-components-memory -
+   2.3 Render and Commit - render-and-commit -
+   2.4 State as Snapshot - state-as-a-snapshot -
+   2.5 Queueing a Series of State Updates - queueing-a-series-of-state-updates -
+   2.6 Updating Objects in State - updating-objects-in-state -
+   2.7 Updating Arrays in State - updating-arrays-in-state -

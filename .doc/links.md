@@ -1,3 +1,12 @@
+CSS & html:
+
+- https://developer.mozilla.org/ru/docs/Learn_web_development/Core/Structuring_content
+
+TypeScript:
+
+- https://scriptdev.ru/guide/000/
+- https://www.typescriptlang.org/docs/handbook/
+
 React:
 
 - https://github.com/evgenii-studitskikh/react-ru-interview-questions?ysclid=ma1fx81tgv193448962

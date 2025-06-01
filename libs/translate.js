@@ -6,6 +6,8 @@ async function translateParagraphs(toTranslate) {
   //console.log(toTranslate);
   const isTheEnd = (index) => Number(index) === toTranslate.length - 1;
   const isWord = (paragraph) => paragraph.match(rWord);
+  const isHeader = (paragraph) => paragraph.match(/^#{1,6}/);
+
   try {
     let allParagraphs = [""];
     toTranslate.push("");
@@ -14,14 +16,15 @@ async function translateParagraphs(toTranslate) {
       const current = toTranslate[key];
       let text = allParagraphs.pop();
 
+      if (isHeader(current)) {
+        const headerTranslated = await translateText(current);
+        allParagraphs.push(text, headerTranslated);
+        continue;
+      }
+
       if ((current.startsWith("```js") || isTheEnd(key)) && isWord(text)) {
         //text = `\r\ntranslated(${text})\r\n`;
-        const translatedResult = await translator.translateText(
-          text,
-          "EN",
-          "RU"
-        );
-        text = translatedResult.text;
+        text = await translateText(text);
       }
       if (current.startsWith("```js")) {
         allParagraphs.push(text, current);
@@ -42,35 +45,12 @@ async function translateParagraphs(toTranslate) {
   }
 }
 
+async function translateText(text) {
+  return `TRANSLATED ${text} TRANSLATED`;
+  // const translatedResult = await translator.translateText(text, "EN", "RU");
+  // return translatedResult.text;
+}
+
 module.exports = {
   translateParagraphs,
 };
-
-// const translatedParagraphs = toTranslate.reduce(
-//   (prev, current, currentIndex) => {
-//     let text = prev.pop();
-
-//     if (
-//       (current.startsWith("```js") || isTheEnd(currentIndex)) &&
-//       isWord(text)
-//     ) {
-//       text = `\r\ntranslated(${text})\r\n`;
-//       /* const translatedResult = await translator.translateText(
-//         text,
-//         "EN",
-//         "RU"
-//       );
-//       text = translatedResult.text; */
-//     }
-
-//     if (current.startsWith("```js")) {
-//       return [...prev, text, current];
-//     }
-//     if (current.startsWith("```")) {
-//       return [...prev, `${text}${current}`, ""];
-//     }
-//     return [...prev, `${text}${current}`];
-//   },
-//   [""]
-// );
-// return translatedParagraphs;
