@@ -2,7 +2,7 @@ const { writeFile } = require("node:fs/promises");
 const { getFileContent } = require("./libs/getFileContent");
 const { topics } = require("./md/learn");
 
-let fileName = topics.test;
+let fileName = topics.interactivity.adding;
 const file = `./md/learn/${fileName}.md`;
 const fileOutput = `./md/output/learn/${fileName}.md`;
 

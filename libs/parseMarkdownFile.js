@@ -16,6 +16,8 @@ const TAGS = [
 ];
 const CODE_TAGS = ["Sandpack"];
 const EXCLUDES = ["[comment]", "[TODO]"];
+const BAD_TAG = "</IllustrationBlock\r\n";
+const GOOD_TAG = "</IllustrationBlock>\r\n";
 
 const rWord = /.*\w+/i;
 const rHeader = /(?<=^#{1,4} )[\s\S]*(?={)/gm;
@@ -55,33 +57,41 @@ async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
     toTranslate = [];
     header = "";
   }
+
+  async function translateHeader(header) {
+    const headerToTranslate = header.match(rHeader);
+    if (headerToTranslate?.length > 0) {
+      const headerTranslated = await translateText(headerToTranslate[0]);
+      return header.replace(headerToTranslate, headerTranslated);
+    }
+
+    return header;
+  }
+
   async function translate() {
     let last = toTranslate.pop(); // Delete paragraph from
     const wrappedEngParagraphs = wrapEngParagraphs(toTranslate, header);
     const translatedParagraphs = await translateParagraphs(toTranslate);
+    const checkedAndTranslatedParagraphs = translatedParagraphs.map(
+      (paragraph) =>
+        paragraph.includes(BAD_TAG)
+          ? paragraph.replace(BAD_TAG, GOOD_TAG)
+          : paragraph
+    );
 
-    const headerToTranslate = last.match(rHeader);
-    if (headerToTranslate?.length > 0) {
-      const headerTranslated = await translateText(headerToTranslate[0]);
-      last = last.replace(headerToTranslate, headerTranslated);
-    }
+    const translatedHeader = await translateHeader(last);
 
     newFile = [
       ...newFile,
-      ...translatedParagraphs,
+      ...checkedAndTranslatedParagraphs,
       ...wrappedEngParagraphs,
-      last,
+      translatedHeader,
     ];
   }
 
   for (let key in paragraphs) {
     let paragraph = paragraphs[key];
     //console.log("interation", key, { isStart, tag, paragraph });
-
-    // debug
-    if (isHeader(paragraph)) {
-      const hi = 1;
-    }
 
     if (isExclude(paragraph)) continue;
 
@@ -99,6 +109,9 @@ async function parseMarkdownFileOld(paragraphsOld, fileNameOutput) {
       if (hasText(toTranslate)) {
         await translate();
         await writeFile(fileNameOutput, newFile);
+      } else if (toTranslate.some(isHeader)) {
+        const translated = toTranslate.map(translateHeader);
+        newFile = [...newFile, ...translated];
       } else {
         newFile = [...newFile, ...toTranslate];
       }
@@ -131,10 +144,6 @@ function hasText(toTranslate) {
     return paragraph.match(rWord);
   });
 }
-
-/* function hasHeader(toTranslate) {
-  return toTranslate.some(isHeader);
-} */
 
 function wrapEngParagraphs(toTranslate, header) {
   return [

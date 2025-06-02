@@ -1,213 +1,435 @@
 ---
-title: Render and Commit
+title: State as a Snapshot
 ---
 
 <Intro>
 
-Before your components are displayed on screen, they must be rendered by React. Understanding the steps in this process will help you think about how your code executes and explain its behavior.
+State variables might look like regular JavaScript variables that you can read and write to. However, state behaves more like a snapshot. Setting it does not change the state variable you already have, but instead triggers a re-render.
 
 </Intro>
 
 <YouWillLearn>
 
-* What rendering means in React
-* When and why React renders a component
-* The steps involved in displaying a component on screen
-* Why rendering does not always produce a DOM update
+* How setting state triggers re-renders
+* When and how state updates
+* Why state does not update immediately after you set it
+* How event handlers access a "snapshot" of the state
 
 </YouWillLearn>
 
-Imagine that your components are cooks in the kitchen, assembling tasty dishes from ingredients. In this scenario, React is the waiter who puts in requests from customers and brings them their orders. This process of requesting and serving UI has three steps:
+## Setting state triggers renders {/*setting-state-triggers-renders*/}
 
-1. **Triggering** a render (delivering the guest's order to the kitchen)
-2. **Rendering** the component (preparing the order in the kitchen)
-3. **Committing** to the DOM (placing the order on the table)
+You might think of your user interface as changing directly in response to the user event like a click. In React, it works a little differently from this mental model. On the previous page, you saw that [setting state requests a re-render](/learn/render-and-commit#step-1-trigger-a-render) from React. This means that for an interface to react to the event, you need to *update the state*.
 
-<IllustrationBlock sequential>
-  <Illustration caption="Trigger" alt="React as a server in a restaurant, fetching orders from the users and delivering them to the Component Kitchen." src="/ru.react.doc/images/docs/illustrations/i_render-and-commit1.png" />
-  <Illustration caption="Render" alt="The Card Chef gives React a fresh Card component." src="/ru.react.doc/images/docs/illustrations/i_render-and-commit2.png" />
-  <Illustration caption="Commit" alt="React delivers the Card to the user at their table." src="/ru.react.doc/images/docs/illustrations/i_render-and-commit3.png" />
-</IllustrationBlock>
-
-## Step 1: Trigger a render {/*step-1-trigger-a-render*/}
-
-There are two reasons for a component to render:
-
-1. It's the component's **initial render.**
-2. The component's (or one of its ancestors') **state has been updated.**
-
-### Initial render {/*initial-render*/}
-
-When your app starts, you need to trigger the initial render. Frameworks and sandboxes sometimes hide this code, but it's done by calling [`createRoot`](/reference/react-dom/client/createRoot) with the target DOM node, and then calling its `render` method with your component:
+In this example, when you press "send", `setIsSent(true)` tells React to re-render the UI:
 
 <Sandpack>
 
-```js src/index.js active
-import Image from './Image.js';
-import { createRoot } from 'react-dom/client';
+```js
+import { useState } from 'react';
 
-const root = createRoot(document.getElementById('root'))
-root.render(<Image />);
-```
-
-```js src/Image.js
-export default function Image() {
+export default function Form() {
+  const [isSent, setIsSent] = useState(false);
+  const [message, setMessage] = useState('Hi!');
+  if (isSent) {
+    return <h1>Your message is on its way!</h1>
+  }
   return (
-    <img
-      src="https://i.imgur.com/ZF6s192.jpg"
-      alt="'Floralis Genérica' by Eduardo Catalano: a gigantic metallic flower sculpture with reflective petals"
-    />
-  );
-}
-```
-
-</Sandpack>
-
-Try commenting out the `root.render()` call and see the component disappear!
-
-### Re-renders when state updates {/*re-renders-when-state-updates*/}
-
-Once the component has been initially rendered, you can trigger further renders by updating its state with the [`set` function.](/reference/react/useState#setstate) Updating your component's state automatically queues a render. (You can imagine these as a restaurant guest ordering tea, dessert, and all sorts of things after putting in their first order, depending on the state of their thirst or hunger.)
-
-<IllustrationBlock sequential>
-  <Illustration caption="State update..." alt="React as a server in a restaurant, serving a Card UI to the user, represented as a patron with a cursor for their head. The patron expresses they want a pink card, not a black one!" src="/ru.react.doc/images/docs/illustrations/i_rerender1.png" />
-  <Illustration caption="...triggers..." alt="React returns to the Component Kitchen and tells the Card Chef they need a pink Card." src="/ru.react.doc/images/docs/illustrations/i_rerender2.png" />
-  <Illustration caption="...render!" alt="The Card Chef gives React the pink Card." src="/ru.react.doc/images/docs/illustrations/i_rerender3.png" />
-</IllustrationBlock>
-
-## Step 2: React renders your components {/*step-2-react-renders-your-components*/}
-
-After you trigger a render, React calls your components to figure out what to display on screen. **"Rendering" is React calling your components.**
-
-* **On initial render,** React will call the root component.
-* **For subsequent renders,** React will call the function component whose state update triggered the render.
-
-This process is recursive: if the updated component returns some other component, React will render _that_ component next, and if that component also returns something, it will render _that_ component next, and so on. The process will continue until there are no more nested components and React knows exactly what should be displayed on screen.
-
-In the following example, React will call `Gallery()` and `Image()` several times:
-
-<Sandpack>
-
-```js src/Gallery.js active
-export default function Gallery() {
-  return (
-    <section>
-      <h1>Inspiring Sculptures</h1>
-      <Image />
-      <Image />
-      <Image />
-    </section>
+    <form onSubmit={(e) => {
+      e.preventDefault();
+      setIsSent(true);
+      sendMessage(message);
+    }}>
+      <textarea
+        placeholder="Message"
+        value={message}
+        onChange={e => setMessage(e.target.value)}
+      />
+      <button type="submit">Send</button>
+    </form>
   );
 }
 
-function Image() {
-  return (
-    <img
-      src="https://i.imgur.com/ZF6s192.jpg"
-      alt="'Floralis Genérica' by Eduardo Catalano: a gigantic metallic flower sculpture with reflective petals"
-    />
-  );
+function sendMessage(message) {
+  // ...
 }
-```
-
-```js src/index.js
-import Gallery from './Gallery.js';
-import { createRoot } from 'react-dom/client';
-
-const root = createRoot(document.getElementById('root'))
-root.render(<Gallery />);
 ```
 
 ```css
-img { margin: 0 10px 10px 0; }
+label, textarea { margin-bottom: 10px; display: block; }
 ```
 
 </Sandpack>
 
-* **During the initial render,** React will [create the DOM nodes](https://developer.mozilla.org/docs/Web/API/Document/createElement) for `<section>`, `<h1>`, and three `<img>` tags. 
-* **During a re-render,** React will calculate which of their properties, if any, have changed since the previous render. It won't do anything with that information until the next step, the commit phase.
+Here's what happens when you click the button:
 
-<Pitfall>
+1. The `onSubmit` event handler executes.
+2. `setIsSent(true)` sets `isSent` to `true` and queues a new render.
+3. React re-renders the component according to the new `isSent` value.
 
-Rendering must always be a [pure calculation](/learn/keeping-components-pure):
+Let's take a closer look at the relationship between state and rendering.
 
-* **Same inputs, same output.** Given the same inputs, a component should always return the same JSX. (When someone orders a salad with tomatoes, they should not receive a salad with onions!)
-* **It minds its own business.** It should not change any objects or variables that existed before rendering. (One order should not change anyone else's order.)
+## Rendering takes a snapshot in time {/*rendering-takes-a-snapshot-in-time*/}
 
-Otherwise, you can encounter confusing bugs and unpredictable behavior as your codebase grows in complexity. When developing in "Strict Mode", React calls each component's function twice, which can help surface mistakes caused by impure functions.
+["Rendering"](/learn/render-and-commit#step-2-react-renders-your-components) means that React is calling your component, which is a function. The JSX you return from that function is like a snapshot of the UI in time. Its props, event handlers, and local variables were all calculated **using its state at the time of the render.**
 
-</Pitfall>
+Unlike a photograph or a movie frame, the UI "snapshot" you return is interactive. It includes logic like event handlers that specify what happens in response to inputs. React updates the screen to match this snapshot and connects the event handlers. As a result, pressing a button will trigger the click handler from your JSX.
 
-<DeepDive>
+When React re-renders a component:
 
-#### Optimizing performance {/*optimizing-performance*/}
+1. React calls your function again.
+2. Your function returns a new JSX snapshot.
+3. React then updates the screen to match the snapshot your function returned.
 
-The default behavior of rendering all components nested within the updated component is not optimal for performance if the updated component is very high in the tree. If you run into a performance issue, there are several opt-in ways to solve it described in the [Performance](https://reactjs.org/docs/optimizing-performance.html) section. **Don't optimize prematurely!**
+<IllustrationBlock sequential>
+    <Illustration caption="React executing the function" src="/ru.react.doc/images/docs/illustrations/i_render1.png" />
+    <Illustration caption="Calculating the snapshot" src="/ru.react.doc/images/docs/illustrations/i_render2.png" />
+    <Illustration caption="Updating the DOM tree" src="/ru.react.doc/images/docs/illustrations/i_render3.png" />
+</IllustrationBlock>
 
-</DeepDive>
+As a component's memory, state is not like a regular variable that disappears after your function returns. State actually "lives" in React itself--as if on a shelf!--outside of your function. When React calls your component, it gives you a snapshot of the state for that particular render. Your component returns a snapshot of the UI with a fresh set of props and event handlers in its JSX, all calculated **using the state values from that render!**
 
-## Step 3: React commits changes to the DOM {/*step-3-react-commits-changes-to-the-dom*/}
+<IllustrationBlock sequential>
+  <Illustration caption="You tell React to update the state" src="/ru.react.doc/images/docs/illustrations/i_state-snapshot1.png" />
+  <Illustration caption="React updates the state value" src="/ru.react.doc/images/docs/illustrations/i_state-snapshot2.png" />
+  <Illustration caption="React passes a snapshot of the state value into the component" src="/ru.react.doc/images/docs/illustrations/i_state-snapshot3.png" />
+</IllustrationBlock>
 
-After rendering (calling) your components, React will modify the DOM.
+Here's a little experiment to show you how this works. In this example, you might expect that clicking the "+3" button would increment the counter three times because it calls `setNumber(number + 1)` three times.
 
-* **For the initial render,** React will use the [`appendChild()`](https://developer.mozilla.org/docs/Web/API/Node/appendChild) DOM API to put all the DOM nodes it has created on screen.
-* **For re-renders,** React will apply the minimal necessary operations (calculated while rendering!) to make the DOM match the latest rendering output.
-
-**React only changes the DOM nodes if there's a difference between renders.** For example, here is a component that re-renders with different props passed from its parent every second. Notice how you can add some text into the `<input>`, updating its `value`, but the text doesn't disappear when the component re-renders:
+See what happens when you click the "+3" button:
 
 <Sandpack>
 
-```js src/Clock.js active
-export default function Clock({ time }) {
+```js
+import { useState } from 'react';
+
+export default function Counter() {
+  const [number, setNumber] = useState(0);
+
   return (
     <>
-      <h1>{time}</h1>
-      <input />
+      <h1>{number}</h1>
+      <button onClick={() => {
+        setNumber(number + 1);
+        setNumber(number + 1);
+        setNumber(number + 1);
+      }}>+3</button>
+    </>
+  )
+}
+```
+
+```css
+button { display: inline-block; margin: 10px; font-size: 20px; }
+h1 { display: inline-block; margin: 10px; width: 30px; text-align: center; }
+```
+
+</Sandpack>
+
+Notice that `number` only increments once per click!
+
+**Setting state only changes it for the *next* render.** During the first render, `number` was `0`. This is why, in *that render's* `onClick` handler, the value of `number` is still `0` even after `setNumber(number + 1)` was called:
+
+```js
+<button onClick={() => {
+  setNumber(number + 1);
+  setNumber(number + 1);
+  setNumber(number + 1);
+}}>+3</button>
+```
+
+Here is what this button's click handler tells React to do:
+
+1. `setNumber(number + 1)`: `number` is `0` so `setNumber(0 + 1)`.
+    - React prepares to change `number` to `1` on the next render.
+2. `setNumber(number + 1)`: `number` is `0` so `setNumber(0 + 1)`.
+    - React prepares to change `number` to `1` on the next render.
+3. `setNumber(number + 1)`: `number` is `0` so `setNumber(0 + 1)`.
+    - React prepares to change `number` to `1` on the next render.
+
+Even though you called `setNumber(number + 1)` three times, in *this render's* event handler `number` is always `0`, so you set the state to `1` three times. This is why, after your event handler finishes, React re-renders the component with `number` equal to `1` rather than `3`.
+
+You can also visualize this by mentally substituting state variables with their values in your code. Since the `number` state variable is `0` for *this render*, its event handler looks like this:
+
+```js
+<button onClick={() => {
+  setNumber(0 + 1);
+  setNumber(0 + 1);
+  setNumber(0 + 1);
+}}>+3</button>
+```
+
+For the next render, `number` is `1`, so *that render's* click handler looks like this:
+
+```js
+<button onClick={() => {
+  setNumber(1 + 1);
+  setNumber(1 + 1);
+  setNumber(1 + 1);
+}}>+3</button>
+```
+
+This is why clicking the button again will set the counter to `2`, then to `3` on the next click, and so on.
+
+## State over time {/*state-over-time*/}
+
+Well, that was fun. Try to guess what clicking this button will alert:
+
+<Sandpack>
+
+```js
+import { useState } from 'react';
+
+export default function Counter() {
+  const [number, setNumber] = useState(0);
+
+  return (
+    <>
+      <h1>{number}</h1>
+      <button onClick={() => {
+        setNumber(number + 5);
+        alert(number);
+      }}>+5</button>
+    </>
+  )
+}
+```
+
+```css
+button { display: inline-block; margin: 10px; font-size: 20px; }
+h1 { display: inline-block; margin: 10px; width: 30px; text-align: center; }
+```
+
+</Sandpack>
+
+If you use the substitution method from before, you can guess that the alert shows "0":
+
+```js
+setNumber(0 + 5);
+alert(0);
+```
+
+But what if you put a timer on the alert, so it only fires _after_ the component re-rendered? Would it say "0" or "5"? Have a guess!
+
+<Sandpack>
+
+```js
+import { useState } from 'react';
+
+export default function Counter() {
+  const [number, setNumber] = useState(0);
+
+  return (
+    <>
+      <h1>{number}</h1>
+      <button onClick={() => {
+        setNumber(number + 5);
+        setTimeout(() => {
+          alert(number);
+        }, 3000);
+      }}>+5</button>
+    </>
+  )
+}
+```
+
+```css
+button { display: inline-block; margin: 10px; font-size: 20px; }
+h1 { display: inline-block; margin: 10px; width: 30px; text-align: center; }
+```
+
+</Sandpack>
+
+Surprised? If you use the substitution method, you can see the "snapshot" of the state passed to the alert.
+
+```js
+setNumber(0 + 5);
+setTimeout(() => {
+  alert(0);
+}, 3000);
+```
+
+The state stored in React may have changed by the time the alert runs, but it was scheduled using a snapshot of the state at the time the user interacted with it!
+
+**A state variable's value never changes within a render,** even if its event handler's code is asynchronous. Inside *that render's* `onClick`, the value of `number` continues to be `0` even after `setNumber(number + 5)` was called. Its value was "fixed" when React "took the snapshot" of the UI by calling your component.
+
+Here is an example of how that makes your event handlers less prone to timing mistakes. Below is a form that sends a message with a five-second delay. Imagine this scenario:
+
+1. You press the "Send" button, sending "Hello" to Alice.
+2. Before the five-second delay ends, you change the value of the "To" field to "Bob".
+
+What do you expect the `alert` to display? Would it display, "You said Hello to Alice"? Or would it display, "You said Hello to Bob"? Make a guess based on what you know, and then try it:
+
+<Sandpack>
+
+```js
+import { useState } from 'react';
+
+export default function Form() {
+  const [to, setTo] = useState('Alice');
+  const [message, setMessage] = useState('Hello');
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    setTimeout(() => {
+      alert(`You said ${message} to ${to}`);
+    }, 5000);
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        To:{' '}
+        <select
+          value={to}
+          onChange={e => setTo(e.target.value)}>
+          <option value="Alice">Alice</option>
+          <option value="Bob">Bob</option>
+        </select>
+      </label>
+      <textarea
+        placeholder="Message"
+        value={message}
+        onChange={e => setMessage(e.target.value)}
+      />
+      <button type="submit">Send</button>
+    </form>
+  );
+}
+```
+
+```css
+label, textarea { margin-bottom: 10px; display: block; }
+```
+
+</Sandpack>
+
+**React keeps the state values "fixed" within one render's event handlers.** You don't need to worry whether the state has changed while the code is running.
+
+But what if you wanted to read the latest state before a re-render? You'll want to use a [state updater function](/learn/queueing-a-series-of-state-updates), covered on the next page!
+
+<Recap>
+
+* Setting state requests a new render.
+* React stores state outside of your component, as if on a shelf.
+* When you call `useState`, React gives you a snapshot of the state *for that render*.
+* Variables and event handlers don't "survive" re-renders. Every render has its own event handlers.
+* Every render (and functions inside it) will always "see" the snapshot of the state that React gave to *that* render.
+* You can mentally substitute state in event handlers, similarly to how you think about the rendered JSX.
+* Event handlers created in the past have the state values from the render in which they were created.
+
+</Recap>
+
+
+
+<Challenges>
+
+#### Implement a traffic light {/*implement-a-traffic-light*/}
+
+Here is a crosswalk light component that toggles when the button is pressed:
+
+<Sandpack>
+
+```js
+import { useState } from 'react';
+
+export default function TrafficLight() {
+  const [walk, setWalk] = useState(true);
+
+  function handleClick() {
+    setWalk(!walk);
+  }
+
+  return (
+    <>
+      <button onClick={handleClick}>
+        Change to {walk ? 'Stop' : 'Walk'}
+      </button>
+      <h1 style={{
+        color: walk ? 'darkgreen' : 'darkred'
+      }}>
+        {walk ? 'Walk' : 'Stop'}
+      </h1>
     </>
   );
 }
 ```
 
-```js src/App.js hidden
-import { useState, useEffect } from 'react';
-import Clock from './Clock.js';
-
-function useTime() {
-  const [time, setTime] = useState(() => new Date());
-  useEffect(() => {
-    const id = setInterval(() => {
-      setTime(new Date());
-    }, 1000);
-    return () => clearInterval(id);
-  }, []);
-  return time;
-}
-
-export default function App() {
-  const time = useTime();
-  return (
-    <Clock time={time.toLocaleTimeString()} />
-  );
-}
+```css
+h1 { margin-top: 20px; }
 ```
 
 </Sandpack>
 
-This works because during this last step, React only updates the content of `<h1>` with the new `time`. It sees that the `<input>` appears in the JSX in the same place as last time, so React doesn't touch the `<input>`—or its `value`!
-## Epilogue: Browser paint {/*epilogue-browser-paint*/}
+Add an `alert` to the click handler. When the light is green and says "Walk", clicking the button should say "Stop is next". When the light is red and says "Stop", clicking the button should say "Walk is next".
 
-After rendering is done and React updated the DOM, the browser will repaint the screen. Although this process is known as "browser rendering", we'll refer to it as "painting" to avoid confusion throughout the docs.
+Does it make a difference whether you put the `alert` before or after the `setWalk` call?
 
-<Illustration alt="A browser painting 'still life with card element'." src="/ru.react.doc/images/docs/illustrations/i_browser-paint.png" />
+<Solution>
 
-<Recap>
+Your `alert` should look like this:
 
-* Any screen update in a React app happens in three steps:
-  1. Trigger
-  2. Render
-  3. Commit
-* You can use Strict Mode to find mistakes in your components
-* React does not touch the DOM if the rendering result is the same as last time
+<Sandpack>
 
-</Recap>
+```js
+import { useState } from 'react';
 
+export default function TrafficLight() {
+  const [walk, setWalk] = useState(true);
+
+  function handleClick() {
+    setWalk(!walk);
+    alert(walk ? 'Stop is next' : 'Walk is next');
+  }
+
+  return (
+    <>
+      <button onClick={handleClick}>
+        Change to {walk ? 'Stop' : 'Walk'}
+      </button>
+      <h1 style={{
+        color: walk ? 'darkgreen' : 'darkred'
+      }}>
+        {walk ? 'Walk' : 'Stop'}
+      </h1>
+    </>
+  );
+}
+```
+
+```css
+h1 { margin-top: 20px; }
+```
+
+</Sandpack>
+
+Whether you put it before or after the `setWalk` call makes no difference. That render's value of `walk` is fixed. Calling `setWalk` will only change it for the *next* render, but will not affect the event handler from the previous render.
+
+This line might seem counter-intuitive at first:
+
+```js
+alert(walk ? 'Stop is next' : 'Walk is next');
+```
+
+But it makes sense if you read it as: "If the traffic light shows 'Walk now', the message should say 'Stop is next.'" The `walk` variable inside your event handler matches that render's value of `walk` and does not change.
+
+You can verify that this is correct by applying the substitution method. When `walk` is `true`, you get:
+
+```js
+<button onClick={() => {
+  setWalk(false);
+  alert('Stop is next');
+}}>
+  Change to Stop
+</button>
+<h1 style={{color: 'darkgreen'}}>
+  Walk
+</h1>
+```
+
+So clicking "Change to Stop" queues a render with `walk` set to `false`, and alerts "Stop is next".
+
+</Solution>
+
+</Challenges>

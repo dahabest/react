@@ -6,7 +6,6 @@ async function translateParagraphs(toTranslate, header) {
   //console.log(toTranslate);
   const isTheEnd = (index) => Number(index) === toTranslate.length - 1;
   const isWord = (paragraph) => paragraph.match(rWord);
-  const isHeader = (paragraph) => paragraph.match(/^#{1,6}/);
 
   try {
     let allParagraphs = [""];
@@ -40,9 +39,9 @@ async function translateParagraphs(toTranslate, header) {
 }
 
 async function translateText(text) {
-  return `TRANSLATED( ${text} ) TRANSLATED`;
-  // const translatedResult = await translator.translateText(text, "EN", "RU");
-  // return translatedResult.text;
+  // return `TRANSLATED( ${text} ) TRANSLATED`;
+  const translatedResult = await translator.translateText(text, "EN", "RU");
+  return translatedResult.text;
 }
 
 module.exports = {
