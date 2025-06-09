@@ -34,6 +34,7 @@ react:
 - https://jser.dev/series/react-source-code-walkthrough?utm_source=chatgpt.com
 - https://pomb.us/build-your-own-react/
 - https://geekpaul.medium.com/lets-build-a-react-from-scratch-part-1-virtualdom-and-renderer-14f4f716de62
+- https://www.youtube.com/watch?v=dpw9EHDh2bM
 
 sandbox origin react:
 
